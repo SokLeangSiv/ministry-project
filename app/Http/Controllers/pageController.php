@@ -187,10 +187,10 @@ class pageController extends Controller
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
-                ->where('status', $request->status)
-                ->where('case_number', $request->case_number)
-                ->where('complainer_name', $request->complainer_name)
-                ->where('complainer_tele', $request->complainer_tele)
+                ->where('status', 'like', '%' . $request->status . '%')
+                ->where('case_number', 'like', '%' . $request->case_number . '%')
+                ->where('complainer_name', 'like', '%' . $request->complainer_name . '%')
+                ->where('complainer_tele', 'like', '%' . $request->complainer_tele . '%')
                 ->whereBetween('sent_date', [$request->start_date, $request->end_date])
                 ->where('tbl_case.department', $department)
                 ->orderBy('sent_date', 'asc')
@@ -213,7 +213,7 @@ class pageController extends Controller
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
                 ->whereBetween('sent_date', [$request->start_date, $request->end_date])
-                ->where('tbl_case.department', $department)
+                ->where('tbl_case.department', 'like', '%' . $department . '%')
                 ->orderBy('sent_date', 'asc')
                 ->get();
             return view('pages.casesFiltered', ['getRecord' => $cases]);
@@ -233,8 +233,8 @@ class pageController extends Controller
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
-                ->where('status', $request->status)
-                ->where('tbl_case.department', $department)
+                ->where('status', 'like', '%' . $request->status . '%')
+                ->where('tbl_case.department', 'like', '%' . $department . '%')
                 ->orderBy('sent_date', 'asc')
                 ->get();
             return view('pages.casesFiltered', ['getRecord' => $cases]);
@@ -254,8 +254,8 @@ class pageController extends Controller
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
-                ->where('case_number', $request->case_number)
-                ->where('tbl_case.department', $department)
+                ->where('case_number', 'like', '%' . $request->case_number . '%')
+                ->where('tbl_case.department', 'like', '%' . $department . '%')
                 ->orderBy('sent_date', 'asc')
                 ->get();
             return view('pages.casesFiltered', ['getRecord' => $cases]);
@@ -275,12 +275,12 @@ class pageController extends Controller
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
-                ->where('complainer_name', $request->complainer_name)
-                ->where('tbl_case.department', $department)
+                ->where('complainer_name', 'like', '%' . $request->complainer_name . '%')
+                ->where('tbl_case.department', 'like', '%' . $department . '%')
                 ->orderBy('sent_date', 'asc')
                 ->get();
             return view('pages.casesFiltered', ['getRecord' => $cases]);
-        }else if ($request->complainer_tele != null) {
+        } else if ($request->complainer_tele != null) {
             $cases = DB::table('tbl_case')
                 ->select(
                     'tbl_case.id', // specify the table name
@@ -296,8 +296,8 @@ class pageController extends Controller
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
-                ->where('complainer_tele', $request->complainer_tele)
-                ->where('tbl_case.department', $department)
+                ->where('complainer_tele', 'like', '%' . $request->complainer_tele . '%')
+                ->where('tbl_case.department', 'like', '%' . $department . '%')
                 ->orderBy('sent_date', 'asc')
                 ->get();
             return view('pages.casesFiltered', ['getRecord' => $cases]);
