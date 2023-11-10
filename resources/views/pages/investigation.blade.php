@@ -11,8 +11,56 @@
     <link rel="stylesheet" href="/richtexteditor/rte_theme_default.css" />
     <script type="text/javascript" src="/richtexteditor/rte.js"></script>
     <script type="text/javascript" src='/richtexteditor/plugins/all_plugins.js'></script>
+    <script>
+        let error = false;
+
+        function validateSubmit(event) {
+            if (error) {
+                error = false;
+                event.preventDefault();
+            } else {
+                document.getElementById('waiting').style.display ="grid";
+            }
+        }
+    </script>
+
+    <style>
+        .loading {
+            z-index: 1500;
+            display: none;
+            place-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            transition: ease-in-out .3s;
+        }
+
+        .pop-up {
+            margin: auto;
+            width: 30vw;
+            height: 20vh;
+            background: rgba(153, 240, 255);
+            border-radius: 3rem;
+            padding: 1rem;
+            display: grid;
+            place-items: center;
+        }
+
+        .pop-up h1 {
+            text-align: center;
+            font-family: 'Moul', cursive;
+        }
+    </style>
 @endsection
 @section('content')
+    <div class="loading" id="waiting">
+        <div class="pop-up">
+            <h1>កំពុងបញ្ចូលទិន្នន័យ...</h1>
+        </div>
+    </div>
     <div class="container ">
         <form action="/updateCase/{{ $case->case_number }}" class="py-2 px-5" id="locationForm" method="POST"
             enctype="multipart/form-data">
@@ -218,67 +266,67 @@
                     </div>
                 </div>
                 {{-- @if ($case->solved_by_user == Auth::id()) --}}
-                    <hr>
-                    <div class="row py-2">
-                        <h4 class="my-auto me-2"><strong
-                                style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong></h4>
-                        <p class="my-auto py-2">{!! $case->case_story !!}</p>
-                    </div>
+                <hr>
+                <div class="row py-2">
+                    <h4 class="my-auto me-2"><strong
+                            style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong></h4>
+                    <p class="my-auto py-2">{!! $case->case_story !!}</p>
+                </div>
 
-                    <hr>
-
-
-                        <div class="py-2">
-                            <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
-                            @if ($case->voice_recorded != null)
-                                @foreach ($audio_files as $voice)
-                                    <div class="d-flex my-2">
-                                        <audio controls>
-                                            <source
-                                                src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
-                                                type="audio/ogg">
-                                            <source
-                                                src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
-                                                type="audio/mpeg">
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                        <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
-                                            class="my-auto text-decoration-none btn btn-warning"><strong>ទាញយក</strong></a>
-                                    </div>
-                                @endforeach
-                            @else
-                                <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
-                            @endif
-                        </div>
-                        <div class="row py-2">
-                            <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
-                            @if ($files != null)
-                                @foreach ($files as $key => $file)
-                                    <div class="py-2 d-flex">
-                                        <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}:
-                                            </strong>
-                                        </h6>
-                                        <div class="d-flex m-0 p-0">
-                                            <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
-                                                class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
-                                        </div>
-                                        <a href="/getfiles/{{ $case->case_number }}/{{ $file }}"
-                                            class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong></a>
-                                    </div>
-                                @endforeach
-                            @else
-                                <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
-                            @endif
-                        </div>
-                    {{-- @else --}}
-                        <hr>
+                <hr>
 
 
-                    <div class="row py-2">
-                        <h4 class="my-auto me-2"><strong
-                                style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong></h4>
-                        <p class="my-auto py-2">{!! $case->case_story !!}</p>
-                    </div>
+                <div class="py-2">
+                    <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
+                    @if ($case->voice_recorded != null)
+                        @foreach ($audio_files as $voice)
+                            <div class="d-flex my-2">
+                                <audio controls>
+                                    <source
+                                        src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
+                                        type="audio/ogg">
+                                    <source
+                                        src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
+                                        type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
+                                    class="my-auto text-decoration-none btn btn-warning"><strong>ទាញយក</strong></a>
+                            </div>
+                        @endforeach
+                    @else
+                        <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
+                    @endif
+                </div>
+                <div class="row py-2">
+                    <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
+                    @if ($files != null)
+                        @foreach ($files as $key => $file)
+                            <div class="py-2 d-flex">
+                                <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}:
+                                    </strong>
+                                </h6>
+                                <div class="d-flex m-0 p-0">
+                                    <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
+                                        class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
+                                </div>
+                                <a href="/getfiles/{{ $case->case_number }}/{{ $file }}"
+                                    class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong></a>
+                            </div>
+                        @endforeach
+                    @else
+                        <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
+                    @endif
+                </div>
+                {{-- @else --}}
+                <hr>
+
+
+                <div class="row py-2">
+                    <h4 class="my-auto me-2"><strong
+                            style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong></h4>
+                    <p class="my-auto py-2">{!! $case->case_story !!}</p>
+                </div>
 
                 {{-- @endif --}}
 
@@ -338,7 +386,7 @@
 
                     </div>
                     <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                        <button type="submit" class="bg-primary py-3 text-white" disabled>បញ្ចូលទិន្នន័យ</button>
+                        <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                     </div>
                 @elseif (
                     ($case->solved_by_user == Auth::id() && $case->status == 1) ||
@@ -414,7 +462,7 @@
 
                         </div>
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                     @elseif ($case->solved_by_user == null)
                         <div class="row pt-3 pb-4 container">
@@ -470,7 +518,7 @@
                         </div>
 
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                     @elseif($case->solved_by_user != Auth::id())
                         <div class="row pt-3 pb-4 container">
@@ -526,7 +574,8 @@
                             @if ($files)
                                 @foreach ($files as $key => $file)
                                     <div class="py-2 d-flex">
-                                        <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}:</strong></h6>
+                                        <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី
+                                                {{ $key + 1 }}:</strong></h6>
                                         <div class="d-flex m-0 p-0">
                                             <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
                                                 class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
@@ -542,7 +591,7 @@
 
                         <div class="row pt-3 pb-4 container" id="imageContainer"></div>
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" class="bg-primary py-3 text-white" disabled>បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                 @endif
                 {{-- end input part --}}
