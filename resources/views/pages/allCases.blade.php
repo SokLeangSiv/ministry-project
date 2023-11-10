@@ -5,35 +5,67 @@
             <form action="/casesFiltered" method="post" enctype="multipart/form-data">
                 @csrf
                 <h4 class="my-auto py-2"><strong>ស្វែងរក</strong></h4>
-                <div class="d-flex w-50 py-2">
-                    <h6 class="my-auto pe-2">ថ្ងៃផ្តើម</h6>
-                    <input type="date" class="w-25 py-1  px-2 rounded" name="start_date" id="start_date">
+                <div class="d-flex justify-content-between">
+                    <div class="w-100">
+                        <div class="d-flex py-2 pe-3">
+                            <div class="pe-3">
+                                <h6 class="my-auto py-2"><strong>ថ្ងៃផ្តើម</strong></h6>
+                                <input type="date" class="form-control border-secondary" name="start_date"
+                                    id="start_date">
+                            </div>
 
-                    <h6 class="my-auto px-2">ថ្ងៃបញ្ចប់</h6>
-                    <input type="date" class="w-25 py-1 px-2 rounded" name="end_date" id="end_date">
+                            <div class="ps-3">
+                                <h6 class="my-auto py-2"><strong>ថ្ងៃបញ្ចប់</strong></h6>
+                                <input type="date" class="form-control border-secondary" name="end_date" id="end_date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="my-auto w-100">
+                        <h6 class="my-auto py-2"><strong>ស្ថានភាព</strong></h6>
+                        <div class="d-flex py-1">
+                            <input type="radio" value="1" name="status"
+                                class="form-check-input my-auto border-secondary">
+                            <label class="px-2 my-auto me-2">
+                                <h6 class="my-auto">បានបញ្ចូន</h6>
+                            </label>
+
+                            <input type="radio" value="2" name="status"
+                                class="form-check-input my-auto border-secondary">
+                            <label class="px-2 my-auto me-2">
+                                <h6 class="my-auto">កំពុងដោះស្រាយ</h6>
+                            </label>
+
+                            <input type="radio" value="3" name="status"
+                                class="form-check-input my-auto border-secondary">
+                            <label class="px-2 my-auto me-2">
+                                <h6 class="my-auto">ដោះស្រាយរួចរាល់</h6>
+                            </label>
+
+                            <input type="radio" value="4" name="status"
+                                class="form-check-input my-auto border-secondary">
+                            <label class="px-2 my-auto me-2">
+                                <h6 class="my-auto">បោះបង់</h6>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <h6 class="my-auto py-2"><strong>ស្ថានភាព</strong></h6>
-                <div class="d-flex">
-                    <input type="radio" value="1" name="status">
-                    <label for="old" class="p-2 my-auto me-4">
-                        <h6 class="my-auto">បានទទួល</h6>
-                    </label>
 
-                    <input type="radio" value="2" name="status">
-                    <label for="old" class="p-2 my-auto me-4">
-                        <h6 class="my-auto">កំពុងដោះស្រាយ</h6>
-                    </label>
-
-                    <input type="radio" value="3" name="status">
-                    <label for="old" class="p-2 my-auto me-4">
-                        <h6 class="my-auto">ដោះស្រាយរួចរាល់</h6>
-                    </label>
-
-                    <input type="radio" value="4" name="status">
-                    <label for="old" class="p-2 my-auto me-4">
-                        <h6 class="my-auto">បោះបង់</h6>
-                    </label>
+                <div class="d-flex py-2">
+                    <div class="pe-4">
+                        <h6 class="my-auto py-2"><strong>លេខបណ្តឹង</strong></h6>
+                        <input type="text" class="form-control border-secondary" name="case_number" placeholder="លេខបណ្តឹង">
+                    </div>
+                    <div class="pe-4">
+                        <h6 class="my-auto py-2"><strong>ឈ្មោះម្ចាស់បណ្តឹង</strong></h6>
+                        <input type="text" class="form-control border-secondary" name="complainer_name" placeholder="ឈ្មោះម្ចាស់បណ្តឹង">
+                    </div>
+                    <div class="pe-4">
+                        <h6 class="my-auto py-2"><strong>លេខទូរស័ព្ទ</strong></h6>
+                        <input type="text" class="form-control border-secondary" name="complainer_tele" placeholder="លេខទូរស័ព្ទ">
+                    </div>
                 </div>
+                
                 <button class="bg-primary text-white border-0 rounded p-2 mt-2 mb-2">ស្វែងរក</button>
             </form>
 

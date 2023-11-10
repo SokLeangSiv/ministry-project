@@ -275,7 +275,7 @@
                                         <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
                                             class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
                                     </div>
-                                    <a href="/getfiles/{{ $case->case_number }}/{{ $file }}"
+                                    <a href="/getfiles/{{ $case->case_number }}/{{ $audio_files }}"
                                         class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong>
                                     </a>
                                 </div>

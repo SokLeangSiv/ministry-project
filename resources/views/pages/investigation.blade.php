@@ -217,7 +217,7 @@
                         </h5>
                     </div>
                 </div>
-
+                {{-- @if ($case->solved_by_user == Auth::id()) --}}
                     <hr>
                     <div class="row py-2">
                         <h4 class="my-auto me-2"><strong
@@ -270,7 +270,7 @@
                                 <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
                             @endif
                         </div>
-
+                    {{-- @else --}}
                         <hr>
 
 
@@ -280,7 +280,7 @@
                         <p class="my-auto py-2">{!! $case->case_story !!}</p>
                     </div>
 
-
+                {{-- @endif --}}
 
                 {{-- input part --}}
 
@@ -340,7 +340,9 @@
                     <div class="row d-flex justify-content-center rounded px-5 mb-4">
                         <button type="submit" class="bg-primary py-3 text-white" disabled>បញ្ចូលទិន្នន័យ</button>
                     </div>
-                @elseif (($case->status == 1) || ( $case->status == 2))
+                @elseif (
+                    ($case->solved_by_user == Auth::id() && $case->status == 1) ||
+                        ($case->solved_by_user == Auth::id() && $case->status == 2))
                     <div class="row pt-3 pb-4 container">
                         <hr>
                         <h4 class="px-0 py-1 mb-3 text-center"><strong
@@ -470,7 +472,78 @@
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
                             <button type="submit" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
-                    
+                    @elseif($case->solved_by_user != Auth::id())
+                        <div class="row pt-3 pb-4 container">
+                            <hr>
+                            <h4 class="px-0 py-1 mb-3 text-center"><strong
+                                    style="font-family: 'Preahvihear', sans-serif;">របាយការណ៏សេុីបអង្កេតបណ្ដោះអាសន្ន</strong>
+                            </h4>
+                            <div class="py-0 rounded" style="white-space:pre-wrap; background:#e9e9e9;">
+                                {!! $case->solved_summary !!}
+                            </div>
+                        </div>
+                        <div class="row pt-3 pb-4 container">
+                            <hr>
+                            <h4 class="px-0 py-1 mb-3 text-center"><strong
+                                    style="font-family: 'Preahvihear', sans-serif;">សេចក្ដីសម្រច</strong></h4>
+                            <div class="py-0 rounded" style="white-space:pre-wrap; background:#e9e9e9;">
+                                {!! $case->solved_summary !!}
+                            </div>
+                        </div>
+                        <div class="row pt-3 pb-4 container">
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    <label for="formFileMultiple" class="form-label h5 mb-3"><strong
+                                            style="font-family: 'Preahvihear', sans-serif;">ភស្តុតាង</strong></label>
+                                    <input class="form-control" type="file" name="evidence[]" multiple id="photo"
+                                        disabled>
+                                </div>
+                            </div>
+                            <div class="col-4"></div>
+                            <div class="col-3 ">
+                                <div class="mb-3">
+                                    <label for="formFileMultiple" class="form-label h5 mb-3"><strong
+                                            style="font-family: 'Preahvihear', sans-serif;">ដំណើរការនិតិវិធី</strong></label>
+                                    <select class="form-select" aria-label="Default select example"​ name="status"
+                                        disabled>
+                                        <option selected>ជ្រើសរើស</option>
+                                        <option value="1"{{ $case->status == 1 ? 'selected' : '' }}>
+                                            បានទទួល</option>
+                                        <option value="2"{{ $case->status == 2 ? 'selected' : '' }}>
+                                            កំពុងដោះស្រាយ</option>
+                                        <option value="3"{{ $case->status == 3 ? 'selected' : '' }}>
+                                            បានដោះស្រាយរួច</option>
+                                        <option value="4"{{ $case->status == 4 ? 'selected' : '' }}>
+                                            បោះបង់</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row py-2">
+                            <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
+                            @if ($files)
+                                @foreach ($files as $key => $file)
+                                    <div class="py-2 d-flex">
+                                        <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}:</strong></h6>
+                                        <div class="d-flex m-0 p-0">
+                                            <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
+                                                class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
+                                        </div>
+                                        <a href="/getfiles/{{ $case->case_number }}/{{ $file }}"
+                                            class="my-auto text-decoration-none btn btn-warning btn btn-warning"><strong>ទាញយក</strong></a>
+                                    </div>
+                                @endforeach
+                            @else
+                                <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
+                            @endif
+                        </div>
+
+                        <div class="row pt-3 pb-4 container" id="imageContainer"></div>
+                        <div class="row d-flex justify-content-center rounded px-5 mb-4">
+                            <button type="submit" class="bg-primary py-3 text-white" disabled>បញ្ចូលទិន្នន័យ</button>
+                        </div>
                 @endif
                 {{-- end input part --}}
             </div>

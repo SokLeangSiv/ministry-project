@@ -41,8 +41,8 @@
                 <h6 class="w-100">{{Auth::user()->username}}</h6>
             </div>
             <div class="d-flex py-1">
-                <label for="fullname" class="my-auto pe-2 w-75 text-start form-check-label">ឈ្មោះថ្មី:</label>
-                <input id="fullname" class="form-control" type="text" name="fullname"/>
+                <label for="fullname" class="my-auto pe-2 w-75 text-start form-check-label">ឈ្មោះ:</label>
+                <h6 class="w-100">{{Auth::user()->fullname}}</h6>
             </div>
               {{-- Validate JS Password Start --}}
 

@@ -171,7 +171,7 @@ class pageController extends Controller
     {
         $department = Auth::user()->department;
 
-        if ((($request->start_date != null) && ($request->end_date != null)) && ($request->status != null)) {
+        if ((($request->start_date != null) && ($request->end_date != null)) && ($request->status != null) && ($request->case_number != null) && ($request->complainer_name != null) && ($request->complainer_tele != null)) {
             $cases = DB::table('tbl_case')
                 ->select(
                     'tbl_case.id', // specify the table name
@@ -188,6 +188,9 @@ class pageController extends Controller
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
                 ->where('status', $request->status)
+                ->where('case_number', $request->case_number)
+                ->where('complainer_name', $request->complainer_name)
+                ->where('complainer_tele', $request->complainer_tele)
                 ->whereBetween('sent_date', [$request->start_date, $request->end_date])
                 ->where('tbl_case.department', $department)
                 ->orderBy('sent_date', 'asc')
@@ -231,6 +234,69 @@ class pageController extends Controller
                 ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
                 ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
                 ->where('status', $request->status)
+                ->where('tbl_case.department', $department)
+                ->orderBy('sent_date', 'asc')
+                ->get();
+            return view('pages.casesFiltered', ['getRecord' => $cases]);
+        } else if ($request->case_number != null) {
+            $cases = DB::table('tbl_case')
+                ->select(
+                    'tbl_case.id', // specify the table name
+                    'case_number',
+                    'is_new',
+                    'sent_date',
+                    'complainer_tele',
+                    'status',
+                    'tbl_user_department.fullname as department_fullname',
+                    'tbl_user_officer.fullname as officer_fullname',
+                    'complainer_name',
+                )
+                ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
+                ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
+                ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
+                ->where('case_number', $request->case_number)
+                ->where('tbl_case.department', $department)
+                ->orderBy('sent_date', 'asc')
+                ->get();
+            return view('pages.casesFiltered', ['getRecord' => $cases]);
+        } else if ($request->complainer_name != null) {
+            $cases = DB::table('tbl_case')
+                ->select(
+                    'tbl_case.id', // specify the table name
+                    'case_number',
+                    'is_new',
+                    'sent_date',
+                    'complainer_tele',
+                    'status',
+                    'tbl_user_department.fullname as department_fullname',
+                    'tbl_user_officer.fullname as officer_fullname',
+                    'complainer_name',
+                )
+                ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
+                ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
+                ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
+                ->where('complainer_name', $request->complainer_name)
+                ->where('tbl_case.department', $department)
+                ->orderBy('sent_date', 'asc')
+                ->get();
+            return view('pages.casesFiltered', ['getRecord' => $cases]);
+        }else if ($request->complainer_tele != null) {
+            $cases = DB::table('tbl_case')
+                ->select(
+                    'tbl_case.id', // specify the table name
+                    'case_number',
+                    'is_new',
+                    'sent_date',
+                    'complainer_tele',
+                    'status',
+                    'tbl_user_department.fullname as department_fullname',
+                    'tbl_user_officer.fullname as officer_fullname',
+                    'complainer_name',
+                )
+                ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
+                ->leftJoin('tbl_user_officer', 'tbl_case.posted_by_user', '=', 'tbl_user_officer.id')
+                ->leftJoin('tbl_user_department', 'tbl_case.solved_by_user', '=', 'tbl_user_department.id')
+                ->where('complainer_tele', $request->complainer_tele)
                 ->where('tbl_case.department', $department)
                 ->orderBy('sent_date', 'asc')
                 ->get();
