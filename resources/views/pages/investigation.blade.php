@@ -23,7 +23,6 @@
             }
         }
     </script>
-
     <style>
         .loading {
             z-index: 1500;
@@ -37,7 +36,6 @@
             background: rgba(0, 0, 0, 0.4);
             transition: ease-in-out .3s;
         }
-
         .pop-up {
             margin: auto;
             width: 30vw;
@@ -48,7 +46,6 @@
             display: grid;
             place-items: center;
         }
-
         .pop-up h1 {
             text-align: center;
             font-family: 'Moul', cursive;
