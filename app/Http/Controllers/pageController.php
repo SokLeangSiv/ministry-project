@@ -364,8 +364,6 @@ class pageController extends Controller
 
     public function viewCase(Request $request)
     {
-
-
         $case = DB::table('tbl_case')
             ->select(
                 'case_number',
@@ -384,10 +382,8 @@ class pageController extends Controller
                 'received_date',
                 'status',
                 'complainer_address',
-              
                 'case_summary',
                 'solved_summary',
-               
                 'solved_by_user'
             )
             ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -416,9 +412,7 @@ class pageController extends Controller
                 'district' => $district,
                 'commune' => $commune,
                 'village' => $village,
-                // 'files' => json_decode($case->files_provided),
-                // 'reference_files' => explode("|", $case->reference_files),
-                // 'audio_files' => explode(',', $case->voice_recorded)
+
             ]
         );
     }
@@ -596,13 +590,10 @@ class pageController extends Controller
                     'case_story',
                     'tbl_case.department', // specify the table name
                     'received_date',
-
                     'status',
                     'complainer_address',
-                 
                     'case_summary',
                     'solved_summary',
-                  
                     'solved_by_user'
                 )
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
