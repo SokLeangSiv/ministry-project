@@ -11,6 +11,7 @@
 
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
+    <script src="/script/view.js"></script>
     <script>
         tinymce.init({
             selector: '#editor',
@@ -26,6 +27,42 @@
         });
     </script>
 @endsection
+
+
+<style>
+    .loading {
+        z-index: 1500;
+        display: none;
+        place-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        transition: ease-in-out .3s;
+        color:white;
+    }
+
+    .pop-up {
+        margin: auto;
+        width: 30vw;
+        height: 20vh;
+
+        border-radius: 3rem;
+        padding: 1rem;
+        display: grid;
+        place-items: center;
+    }
+
+    .pop-up h1 {
+        text-align: center;
+        font-family: 'Moul', cursive;
+        animation: wave 2s infinite;
+    }
+
+
+</style>
 
 
 @section('content')
@@ -233,7 +270,7 @@
                     </div>
                 </div>
 
-                @if ($case->solved_by_user == Auth::id())
+
                     <hr>
                     <h5 class="my-auto me-2"><strong
                             style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong></h5>
@@ -244,96 +281,70 @@
 
                     <hr>
 
-                    <div class="py-2 d-flex">
-                        <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
-                        @if ($case->voice_recorded != null)
-                        @foreach ($audio_files as $voice)
-                            <audio controls>
-                                <source
-                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $case->voice_recorded }}"
-                                    type="audio/ogg">
-                                <source
-                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $case->voice_recorded }}"
-                                    type="audio/mpeg">
-                                Your browser does not support the audio element.
-                            </audio>
-                            <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
-                                class="my-auto text-decoration-none btn btn-warning"><strong>ទាញយក</strong></a>
-                            @endforeach
-                        @else
-                            <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
-                        @endif
-                    </div>
+
                     <div class="row py-2">
-                        <h6 class="my-auto me-2"><strong>ឯកសារ: </strong></h6>
-                        @if ($files != null)
-                            @foreach ($files as $key => $file)
-                                <div class="py-2 d-flex">
-                                    <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}: </strong>
-                                    </h6>
-                                    <div class="d-flex m-0 p-0">
-                                        <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
-                                            class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
+                        <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
+                        @if (count($officer_files) > 0)
+                            @foreach ($officer_files as $key => $file)
+                                <div class="file-container">
+                                    <div class="loading" id="file{{ $key }}">
+                                        <div class="pop-up">
+                                            @if (in_array($file->type, ['pdf']))
+                                                <embed
+                                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                    type="application/pdf" height="600" width="1200">
+                                            @elseif(in_array($file->type, ['png', 'jpeg', 'jpg', 'gif']))
+                                                <img src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                    height="600" alt="Example Image" />
+                                            @elseif(in_array($file->type, ['mp3', 'ogg', 'wav', 'aac']))
+                                                <audio controls>
+                                                    <source
+                                                        src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                        type="audio/{{ $file->type }}">
+                                                    ឯកសារប្រភេទនេះមិនអាចមើលបានទេ
+                                                </audio>
+                                            @else
+                                                <h6 class="px-3 py-2 text-white font-weight-bold"
+                                                    style="background: rgba(128, 128, 128, 0.774)">
+                                                    ឯកសារប្រភេទនេះមិនអាចមើលបានទេ</h6>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <a href="/getfiles/{{ $case->case_number }}/{{ $audio_files }}"
-                                        class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong>
-                                    </a>
+
+                                    <div class="py-2 d-flex">
+                                        @if ($file->type == 'pdf')
+                                            <img src="/smallpdf.png" alt="smallpdf.png" height="40" class="me-2">
+                                        @elseif (in_array($file->type, ['png', 'jpeg', 'jpg', 'gif']))
+                                            <img src="/smallImg.png" alt="smallImg.png" height="40" class="me-2">
+                                        @elseif (in_array($file->type, ['mp3', 'ogg', 'wav', 'aac']))
+                                            <img src="/smallAudio.png" alt="smallAudio.png" height="40" class="me-2">
+                                        @else
+                                            <img src="/anyType.png" alt="anyType.png" height="40" class="me-2">
+                                        @endif
+
+                                        <h6 class="my-auto me-2 text-danger d-flex">
+                                            <strong>{{ $file->filename . '.' . $file->type }}</strong>
+                                        </h6>
+
+                                        <h6 class="my-auto me-2 text-primary">({{ $file->size }}kb)</h6>
+
+                                        <img src="/viewFile.png" alt="viewFile.png" height="40" class="me-3"
+                                            onclick="displayFiles({{ $key }})" style="cursor: pointer;">
+
+                                        <a href="/getfiles/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                            class="my-auto text-decoration-none">
+                                            <img src="/download.png" alt="/download.png" height="40">
+                                        </a>
+
+
+                                    </div>
                                 </div>
                             @endforeach
                         @else
-                            <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
-                        @endif
-                    </div>
-                @else
-                    <hr>
-                    <div class="row py-2">
-                        <h5 class="my-auto me-2"><strong
-                                style="font-family: 'Preahvihear', sans-serif;">ខ្លឹមសារបណ្តឹង</strong>
-                        </h5>
-                        <p class="my-auto py-2">{!! $case->case_story !!}</p>
-                    </div>
-
-                    <div class="py-2 d-flex">
-                        <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
-                        @if ($case->voice_recorded != null)
-                        @foreach ($audio_files as $voice)
-                            <audio controls>
-                                <source
-                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $case->voice_recorded }}"
-                                    type="audio/ogg">
-                                <source
-                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $case->voice_recorded }}"
-                                    type="audio/mpeg">
-                                Your browser does not support the audio element.
-                            </audio>
-                            <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $voice }}"
-                                class="my-auto text-decoration-none btn btn-warning"><strong>ទាញយក</strong></a>
-                            @endforeach
-                        @else
-                            <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
-                        @endif
-                    </div>
-                    <div class="row py-2">
-                        <h6 class="my-auto me-2"><strong>ឯកសារ: </strong></h6>
-                        @if ($files != null)
-                            @foreach ($files as $key => $file)
-                                <div class="py-2 d-flex">
-                                    <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី {{ $key + 1 }}: </strong>
-                                    </h6>
-                                    <div class="d-flex m-0 p-0">
-                                        <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file }}"
-                                            class="my-auto text-decoration-none text-light me-3 btn btn-primary"><strong>ពិនិត្យ</strong></a>
-                                    </div>
-                                    <a href="/getfiles/{{ $case->case_number }}/{{ $voice }}"
-                                        class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong></a>
-                                </div>
-                            @endforeach
-                        @else
-                            <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
+                            <h6 class="my-auto text-danger"><strong>គ្មានឯកសារទេ</strong></h6>
                         @endif
                     </div>
 
-                @endif
                 <div class="row pt-3 pb-4 container">
                     <hr>
                     <h4 class="px-0 py-1 mb-3 text-center"><strong
@@ -352,35 +363,75 @@
                         {!! $case->solved_summary !!}
                     </div>
                 </div>
-                <div class="row pt-3 pb-4 container">
-                    <div class="col-6">
-                        <div class="mb-3">
-                            <label for="formFileMultiple" class="form-label h6 mb-3 fw-bold">ភស្តុតាង</label>
-                            <div class="row py-2">
-                                <h6 class="my-auto me-2"><strong>ឯកសារ: </strong></h6>
-                                @if (!empty($reference_files) && !empty(array_filter($reference_files)))
-                                    @foreach ($reference_files as $key => $reference_file)
-                                        <div class="py-2 d-flex">
-                                            <h6 class="my-auto me-2 text-danger "><strong>ឯកសារទី
-                                                    {{ $key + 1 }}:</strong></h6>
-                                            <div class="d-flex m-0 p-0">
-                                                <a href="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $reference_file }}"
-                                                    class="my-auto text-decoration-none text-light me-3 btn btn-primary "><strong>ពិនិត្យ</strong></a>
-                                            </div>
-                                            <a href="/getfiles/{{ $case->case_number }}/{{ $reference_file }}"
-                                                class="my-auto text-decoration-none me-3 btn btn-warning"><strong>ទាញយក</strong></a>
-                                            <a href="/deleteFile/{{ $case->case_number }}/{{ $reference_file }}"
-                                                class="my-auto text-decoration-none me-3 btn btn-danger"><strong>លុបចោល</strong></a>
 
+
+                <div class="row pt-3 pb-4 container">
+
+                    <div class="row py-2">
+                        <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
+                        @if (count($department_file) > 0)
+                            @foreach ($department_file as $key => $file)
+                                <div class="file-container">
+                                    <div class="loading" id="file{{ $key }}">
+                                        <div class="pop-up">
+                                            @if (in_array($file->type, ['pdf']))
+                                                <embed
+                                                    src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                    type="application/pdf" height="600" width="1200">
+                                            @elseif(in_array($file->type, ['png', 'jpeg', 'jpg', 'gif']))
+                                                <img src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                    height="600" alt="Example Image" />
+                                            @elseif(in_array($file->type, ['mp3', 'ogg', 'wav', 'aac']))
+                                                <audio controls>
+                                                    <source
+                                                        src="https://mediacomplaint.sgp1.cdn.digitaloceanspaces.com/files_complaint/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                                        type="audio/{{ $file->type }}">
+                                                    ឯកសារប្រភេទនេះមិនអាចមើលបានទេ
+                                                </audio>
+                                            @else
+                                                <h6 class="px-3 py-2 text-white font-weight-bold"
+                                                    style="background: rgba(128, 128, 128, 0.774)">
+                                                    ឯកសារប្រភេទនេះមិនអាចមើលបានទេ</h6>
+                                            @endif
                                         </div>
-                                    @endforeach
-                                @else
-                                    <h6 class="my-auto"><strong>គ្មានឯកសារទេ</strong></h6>
-                                @endif
-                            </div>
-                        </div>
+                                    </div>
+
+                                    <div class="py-2 d-flex">
+                                        @if ($file->type == 'pdf')
+                                            <img src="/smallpdf.png" alt="smallpdf.png" height="40" class="me-2">
+                                        @elseif (in_array($file->type, ['png', 'jpeg', 'jpg', 'gif']))
+                                            <img src="/smallImg.png" alt="smallImg.png" height="40" class="me-2">
+                                        @elseif (in_array($file->type, ['mp3', 'ogg', 'wav', 'aac']))
+                                            <img src="/smallAudio.png" alt="smallAudio.png" height="40" class="me-2">
+                                        @else
+                                            <img src="/anyType.png" alt="anyType.png" height="40" class="me-2">
+                                        @endif
+
+                                        <h6 class="my-auto me-2 text-danger d-flex">
+                                            <strong>{{ $file->filename . '.' . $file->type }}</strong>
+                                        </h6>
+
+                                        <h6 class="my-auto me-2 text-primary">({{ $file->size }}kb)</h6>
+
+                                        <img src="/viewFile.png" alt="viewFile.png" height="40" class="me-3"
+                                            onclick="displayFiles({{ $key }})" style="cursor: pointer;">
+
+                                        <a href="/getfiles/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                            class="my-auto text-decoration-none">
+                                            <img src="/download.png" alt="/download.png" height="40">
+                                        </a>
+                                        <a href="/deleteFile/{{ $case->case_number }}/{{ $file->filename . '.' . $file->type }}"
+                                            class="my-auto text-decoration-none">
+                                            <img src="/delete.png" alt="/delete.png" height="30">
+                                        </a>
+                                        
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <h6 class="my-auto text-danger"><strong>គ្មានឯកសារទេ</strong></h6>
+                        @endif
                     </div>
-                </div>
             </div>
 
         </form>

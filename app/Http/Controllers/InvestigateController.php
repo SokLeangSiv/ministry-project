@@ -14,58 +14,60 @@ class InvestigateController extends Controller
     {
         $case_id = $request->case_id;
         $subfolder = "files_complaint/" . $case_id;
-        $image = array();
 
-        $audio_files = array();
+        $id = DB::table('tbl_case')->where('case_number', $case_id)->select('id')->first();
 
         try {
 
 
 
-            if ($files = $request->file('evidence')) {
-                $index = 1; // Initialize a counter
-                $image = []; // Initialize an array to store new file names
+            if ($request->has('evidence')) {
+                // Get the count of already uploaded files for the same case_id and file_from
+                $file_count = DB::table('tbl_files')
+                    ->where('case_id', $id->id)
+                    ->where('file_from', 2)
+                    ->count();
 
-                foreach ($files as $file) {
-                    // Add 'video/mp4', 'audio/mpeg' to the array
-                    if (!in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'application/pdf', 'video/mp4', 'audio/mpeg'])) {
-                        continue;
+                foreach ($request->file('evidence') as $key => $file) {
+                    try {
+                        $ext =  $file->getClientOriginalExtension();
+                        // Continue the file numbering from where it left off
+                        $filename = $case_id . '_' . ($file_count + $key + 1) . '_evidence';
+                        $newFileName = $filename . '.' . $ext;
+
+                        $fileSize = $file->getSize();
+                        $fileSize /= 1024;
+
+                        $formattedSize = number_format($fileSize, 2);
+                        $floatSize = floatval($formattedSize);
+
+                        DB::table('tbl_files')->insert([
+                            'filename' => $filename,
+                            'type' => $ext,
+                            'size' => $floatSize,
+                            'case_id' => $id->id,
+                            'file_from' => 2
+                        ]);
+                    } catch (\Throwable $th) {
+                        dd($th->getMessage());
                     }
-
-                    $file_name = $request->case_id . '_' . $index; // Append the counter to the case_id
-                    $ext = strtolower($file->getClientOriginalExtension());
-                    $file_full_name = $file_name . '.' . $ext;
-
-                    // Store the file in 'spaces' disk and get the path
-                    $file->storeAs($subfolder, $file_full_name, 'spaces');
-
-                    array_push($image, $file_full_name); // Store only the file name and extension
-
-                    $index++; // Increment the counter for each file
                 }
-
-                // Fetch existing files from the database
-                $existingFiles = DB::table('tbl_case')->where('case_number', $request->case_id)->pluck('reference_files')->first();
-                $existingFiles = explode('|', $existingFiles);
-
-                // Merge existing files with new ones
-                $image = array_merge($existingFiles, $image);
             }
             if ($request->solved_summary != null || $request->case_summary != null) {
 
-                if ($request->evidence == null ) {
+                if ($request->evidence == null) {
 
                     if ($request->status == 3) {
                         $case = DB::table('tbl_case')->where('case_number', $request->case_id)
-                            ->update([
+                            ->updateGetId([
                                 'case_summary' => $request->case_summary,
                                 'solved_summary' => $request->solved_summary,
                                 'solved_by_user' => Auth::user()->id,
                                 'status' => $request->status,
                             ]);
 
-                            return redirect()->route('viewcase', ['case_id'=> $request->case_id])->with('success','');
-                        }else {
+                        return redirect()->route('viewcase', ['case_id' => $request->case_id])->with('success', '');
+                    } else {
 
                         DB::table('tbl_case')->where('case_number', $request->case_id)
 
@@ -82,10 +84,7 @@ class InvestigateController extends Controller
 
                         $case = DB::table('tbl_case')->where('case_number', $request->case_id)
 
-                            ->update([
-
-
-                                'reference_files' => implode('|', $image),
+                            ->updateGetId([
 
                                 'case_summary' => $request->case_summary,
                                 'solved_summary' => $request->solved_summary,
@@ -93,30 +92,43 @@ class InvestigateController extends Controller
                                 'status' => $request->status,
                             ]);
 
-                            return redirect()->route('viewcase', ['case_id'=> $request->case_id])->with('success','');
 
+                        // DB::table('tbl_files')->where('case_id', $request->case_id)
+                        //     ->update([
+                        //         'filename' =>$file_name,
+                        //         'type' => $ext,
+                        //         'size' => $file->getClientSize(),
+                        //         'case_id' => $case,
+                        //     ]);
+
+                        return redirect()->route('viewcase', ['case_id' => $request->case_id])->with('success', '');
                     } else {
 
 
-                        DB::table('tbl_case')->where('case_number', $request->case_id)
+                        $case = DB::table('tbl_case')->where('case_number', $request->case_id)
 
-                            ->update([
-
-
-                                'reference_files' => implode('|', $image),
+                            ->updateGetId([
 
                                 'case_summary' => $request->case_summary,
                                 'solved_summary' => $request->solved_summary,
                                 'solved_by_user' => Auth::user()->id,
                                 'status' => $request->status,
                             ]);
+
+                        // DB::table('tbl_files')->where('case_id', $request->case_id)
+                        // ->update([
+                        //     'filename' =>$file_name,
+                        //     'type' => $ext,
+                        //     'size' => $file->getClientSize(),
+                        //     'case_id' => $case ,
+                        // ]);
                     }
                 }
             } else {
 
 
 
-                if ($request->evidence == null || $request->sloved_summary == null ) {
+                if ($request->evidence == null || $request->sloved_summary == null) {
 
                     if ($request->status == 1) {
                         DB::table('tbl_case')->where('case_number', $request->case_id)
@@ -146,41 +158,47 @@ class InvestigateController extends Controller
                     }
                 } else {
 
-                    DB::table('tbl_case')->where('case_number', $request->case_id)
+                    $case = DB::table('tbl_case')->where('case_number', $request->case_id)
 
-                        ->update([
+                        ->updateGetId([
 
                             'status' => '2',
                             'solved_by_user' => Auth::user()->id,
-                            'reference_files' => implode('|', $image),
+
 
 
                         ]);
+
+                    // DB::table('tbl_files')->where('case_id', $request->case_id)
+                    // ->update([
+                    //     'filename' =>$file_name,
+                    //     'type' => $ext,
+                    //     'size' => $file->getClientSize(),
+                    //     'case_id' => $case,
+                    // ]);
                 }
             }
 
-            $dataTemp =  implode('|', $image);
 
 
-            if(strlen($dataTemp)> 0){
+            if ($request->evidence != null) {
+                // DB::table('tbl_case')->where('case_number', $request->case_id)
 
-                if($dataTemp [0] == '|'){
-                    $dataTemp = substr($dataTemp, 1);
-
-                }
-            }
+                //     ->update([
 
 
-            if($request->evidence != null){
-                DB::table('tbl_case')->where('case_number', $request->case_id)
-
-            ->update([
+                //         'reference_files' => $dataTemp,
 
 
-                'reference_files' =>$dataTemp,
+                //     ]);
 
-
-            ]);
+                // DB::table('tbl_files')->where('case_id', $request->case_id)
+                // ->update([
+                //     'filename' =>$file_name,
+                //     'type' => $ext,
+                //     'size' => $file->getClientSize(),
+                //     'case_id' => $request->case_id,
+                // ]);
             }
 
             return redirect()->back()->with('success', 'ការបញ្ចូលទិន្នន័យបានជោគជ័យ');
