@@ -32,7 +32,7 @@ class InvestigateController extends Controller
                         continue;
                     }
 
-                    $file_name = $request->case_id . '_' . $index; // Append the counter to the case_id
+                    $file_name = $request->case_id . '_' . $index . '_evidence'; // Append '_evidence' to the filename
                     $ext = strtolower($file->getClientOriginalExtension());
                     $file_full_name = $file_name . '.' . $ext;
 
@@ -44,6 +44,7 @@ class InvestigateController extends Controller
                     $index++; // Increment the counter for each file
                 }
 
+
                 // Fetch existing files from the database
                 $existingFiles = DB::table('tbl_case')->where('case_number', $request->case_id)->pluck('reference_files')->first();
                 $existingFiles = explode('|', $existingFiles);
@@ -53,7 +54,7 @@ class InvestigateController extends Controller
             }
             if ($request->solved_summary != null || $request->case_summary != null) {
 
-                if ($request->evidence == null ) {
+                if ($request->evidence == null) {
 
                     if ($request->status == 3) {
                         $case = DB::table('tbl_case')->where('case_number', $request->case_id)
@@ -64,8 +65,8 @@ class InvestigateController extends Controller
                                 'status' => $request->status,
                             ]);
 
-                            return redirect()->route('viewcase', ['case_id'=> $request->case_id])->with('success','');
-                        }else {
+                        return redirect()->route('viewcase', ['case_id' => $request->case_id])->with('success', '');
+                    } else {
 
                         DB::table('tbl_case')->where('case_number', $request->case_id)
 
@@ -84,17 +85,19 @@ class InvestigateController extends Controller
 
                             ->update([
 
-
-                                'reference_files' => implode('|', $image),
-
                                 'case_summary' => $request->case_summary,
                                 'solved_summary' => $request->solved_summary,
                                 'solved_by_user' => Auth::user()->id,
                                 'status' => $request->status,
                             ]);
 
-                            return redirect()->route('viewcase', ['case_id'=> $request->case_id])->with('success','');
 
+                        DB::table('tbl_case')->where('case_number', $request->case_id)
+                            ->insert([
+                                'reference_files' => implode('|', $image),
+                            ]);
+
+                        return redirect()->route('viewcase', ['case_id' => $request->case_id])->with('success', '');
                     } else {
 
 
@@ -102,13 +105,15 @@ class InvestigateController extends Controller
 
                             ->update([
 
-
-                                'reference_files' => implode('|', $image),
-
                                 'case_summary' => $request->case_summary,
                                 'solved_summary' => $request->solved_summary,
                                 'solved_by_user' => Auth::user()->id,
                                 'status' => $request->status,
+                            ]);
+
+                        DB::table('tbl_case')->where('case_number', $request->case_id)
+                            ->insert([
+                                'reference_files' => implode('|', $image),
                             ]);
                     }
                 }
@@ -116,7 +121,7 @@ class InvestigateController extends Controller
 
 
 
-                if ($request->evidence == null || $request->sloved_summary == null ) {
+                if ($request->evidence == null || $request->sloved_summary == null) {
 
                     if ($request->status == 1) {
                         DB::table('tbl_case')->where('case_number', $request->case_id)
@@ -152,9 +157,14 @@ class InvestigateController extends Controller
 
                             'status' => '2',
                             'solved_by_user' => Auth::user()->id,
+
+
+
+                        ]);
+
+                    DB::table('tbl_case')->where('case_number', $request->case_id)
+                        ->insert([
                             'reference_files' => implode('|', $image),
-
-
                         ]);
                 }
             }
@@ -162,25 +172,29 @@ class InvestigateController extends Controller
             $dataTemp =  implode('|', $image);
 
 
-            if(strlen($dataTemp)> 0){
+            if (strlen($dataTemp) > 0) {
 
-                if($dataTemp [0] == '|'){
+                if ($dataTemp[0] == '|') {
                     $dataTemp = substr($dataTemp, 1);
-
                 }
             }
 
 
-            if($request->evidence != null){
+            if ($request->evidence != null) {
+                // DB::table('tbl_case')->where('case_number', $request->case_id)
+
+                //     ->update([
+
+
+                //         'reference_files' => $dataTemp,
+
+
+                //     ]);
+
                 DB::table('tbl_case')->where('case_number', $request->case_id)
-
-            ->update([
-
-
-                'reference_files' =>$dataTemp,
-
-
-            ]);
+                ->insert([
+                    'reference_files' => implode('|', $image),
+                ]);
             }
 
             return redirect()->back()->with('success', 'ការបញ្ចូលទិន្នន័យបានជោគជ័យ');

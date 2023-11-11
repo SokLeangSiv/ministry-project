@@ -273,7 +273,7 @@
                 <hr>
 
 
-                <div class="py-2">
+                {{-- <div class="py-2">
                     <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
                     @if ($case->voice_recorded != null)
                         @foreach ($audio_files as $voice)
@@ -294,7 +294,8 @@
                     @else
                         <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
                     @endif
-                </div>
+                </div> --}}
+                
                 <div class="row py-2">
                     <h5 class="my-auto me-2"><strong>ឯកសារ: </strong></h5>
                     @if ($files != null)

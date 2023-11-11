@@ -293,7 +293,7 @@
                         <p class="my-auto py-2">{!! $case->case_story !!}</p>
                     </div>
 
-                    <div class="py-2 d-flex">
+                    {{-- <div class="py-2 d-flex">
                         <h6 class="my-auto me-2"><strong>សារសម្លេងសន្ទនា: </strong></h6>
                         @if ($case->voice_recorded != null)
                         @foreach ($audio_files as $voice)
@@ -312,7 +312,8 @@
                         @else
                             <h6 class="px-0 my-auto text-danger"><strong>មិនមានសារសម្លេងទេ</strong></h6>
                         @endif
-                    </div>
+                    </div> --}}
+                    
                     <div class="row py-2">
                         <h6 class="my-auto me-2"><strong>ឯកសារ: </strong></h6>
                         @if ($files != null)
