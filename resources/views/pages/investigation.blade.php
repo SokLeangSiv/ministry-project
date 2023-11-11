@@ -19,7 +19,7 @@
                 error = false;
                 event.preventDefault();
             } else {
-                document.getElementById('waiting').style.display ="grid";
+                document.getElementById('waiting').style.display = "grid";
             }
         }
     </script>
@@ -36,6 +36,7 @@
             background: rgba(0, 0, 0, 0.4);
             transition: ease-in-out .3s;
         }
+
         .pop-up {
             margin: auto;
             width: 30vw;
@@ -47,9 +48,25 @@
             place-items: center;
         }
         .pop-up h1 {
-            text-align: center;
-            font-family: 'Moul', cursive;
-        }
+    text-align: center;
+    font-family: 'Moul', cursive;
+    animation: wave 2s infinite;
+}
+
+@keyframes wave {
+    0%, 100% {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(0.9, 1.1);
+    }
+
+    75% {
+        transform: scale(1.1, 0.9);
+    }
+}
+
     </style>
 @endsection
 @section('content')
@@ -383,7 +400,8 @@
 
                     </div>
                     <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                        <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                        <button type="submit" id="submit" onclick="validateSubmit(event)"
+                            class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                     </div>
                 @elseif (
                     ($case->solved_by_user == Auth::id() && $case->status == 1) ||
@@ -459,7 +477,8 @@
 
                         </div>
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)"
+                                class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                     @elseif ($case->solved_by_user == null)
                         <div class="row pt-3 pb-4 container">
@@ -515,7 +534,8 @@
                         </div>
 
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)"
+                                class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                     @elseif($case->solved_by_user != Auth::id())
                         <div class="row pt-3 pb-4 container">
@@ -588,7 +608,8 @@
 
                         <div class="row pt-3 pb-4 container" id="imageContainer"></div>
                         <div class="row d-flex justify-content-center rounded px-5 mb-4">
-                            <button type="submit" id="submit" onclick="validateSubmit(event)" class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
+                            <button type="submit" id="submit" onclick="validateSubmit(event)"
+                                class="bg-primary py-3 text-white">បញ្ចូលទិន្នន័យ</button>
                         </div>
                 @endif
                 {{-- end input part --}}

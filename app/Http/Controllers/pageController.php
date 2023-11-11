@@ -322,13 +322,11 @@ class pageController extends Controller
                 'case_story',
                 'tbl_case.department',
                 'received_date',
-                'voice_recorded',
                 'status',
                 'complainer_address',
-                'files_provided',
                 'case_summary',
                 'solved_summary',
-                'reference_files',
+               
                 'solved_by_user'
             )
             ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -357,9 +355,9 @@ class pageController extends Controller
                 'district' => $district,
                 'commune' => $commune,
                 'village' => $village,
-                'files' => json_decode($case->files_provided),
-                'reference_files' => explode("|", $case->reference_files),
-                'audio_files' => explode(',', $case->voice_recorded)
+                // 'files' => json_decode($case->files_provided),
+                // // 'reference_files' => explode("|", $case->reference_files),
+                // 'audio_files' => explode(',', $case->voice_recorded)
             ]
         );
     }
@@ -384,13 +382,12 @@ class pageController extends Controller
                 'case_story',
                 'tbl_case.department',
                 'received_date',
-                'voice_recorded',
                 'status',
                 'complainer_address',
-                'files_provided',
+              
                 'case_summary',
                 'solved_summary',
-                'reference_files',
+               
                 'solved_by_user'
             )
             ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -419,9 +416,9 @@ class pageController extends Controller
                 'district' => $district,
                 'commune' => $commune,
                 'village' => $village,
-                'files' => json_decode($case->files_provided),
-                'reference_files' => explode("|", $case->reference_files),
-                'audio_files' => explode(',', $case->voice_recorded)
+                // 'files' => json_decode($case->files_provided),
+                // 'reference_files' => explode("|", $case->reference_files),
+                // 'audio_files' => explode(',', $case->voice_recorded)
             ]
         );
     }
@@ -568,13 +565,13 @@ class pageController extends Controller
                     'case_story',
                     'tbl_case.department', // specify the table name
                     'received_date',
-                    'voice_recorded',
+
                     'status',
                     'complainer_address',
-                    'files_provided',
+                   
                     'case_summary',
                     'solved_summary',
-                    'reference_files',
+                  
                     'solved_by_user'
                 )
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -599,13 +596,13 @@ class pageController extends Controller
                     'case_story',
                     'tbl_case.department', // specify the table name
                     'received_date',
-                    'voice_recorded',
+
                     'status',
                     'complainer_address',
-                    'files_provided',
+                 
                     'case_summary',
                     'solved_summary',
-                    'reference_files',
+                  
                     'solved_by_user'
                 )
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
