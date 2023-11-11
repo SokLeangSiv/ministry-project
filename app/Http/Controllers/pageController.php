@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-
+use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Offset;
 
 class pageController extends Controller
 {
@@ -322,13 +322,11 @@ class pageController extends Controller
                 'case_story',
                 'tbl_case.department',
                 'received_date',
-                'voice_recorded',
                 'status',
                 'complainer_address',
-                'files_provided',
                 'case_summary',
                 'solved_summary',
-                'reference_files',
+
                 'solved_by_user'
             )
             ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -348,7 +346,21 @@ class pageController extends Controller
         $commune = DB::table('communes')->select("name")->where('id', $location->complainer_commune)->first();
         $village = DB::table('villages')->select("name")->where('id', $location->complainer_village)->first();
 
+        $officer_files = DB::table("tbl_files")
+            ->select('filename', 'type', 'size')
+            ->leftJoin('tbl_case', 'tbl_files.case_id', '=', 'tbl_case.id')
+            ->where('case_number', $request->case_id)
+            ->where('file_from', 1)
+            ->get();
 
+        $department_file = DB::table('tbl_files')
+            ->select('filename', 'type', 'size')
+            ->leftJoin('tbl_case', 'tbl_files.case_id', '=', 'tbl_case.id')
+            ->where('case_number', $request->case_id)
+            ->where('file_from', 2)
+            ->get();
+
+                // dd($officer_files);
         return view(
             'pages/investigation',
             [
@@ -357,9 +369,8 @@ class pageController extends Controller
                 'district' => $district,
                 'commune' => $commune,
                 'village' => $village,
-                'files' => json_decode($case->files_provided),
-                'reference_files' => explode("|", $case->reference_files),
-                'audio_files' => explode(',', $case->voice_recorded)
+                'department_file' => $department_file,
+                'officer_files' => $officer_files,
             ]
         );
     }
@@ -384,13 +395,12 @@ class pageController extends Controller
                 'case_story',
                 'tbl_case.department',
                 'received_date',
-                'voice_recorded',
                 'status',
                 'complainer_address',
-                'files_provided',
+
                 'case_summary',
                 'solved_summary',
-                'reference_files',
+
                 'solved_by_user'
             )
             ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -411,6 +421,23 @@ class pageController extends Controller
         $village = DB::table('villages')->select("name")->where('id', $location->complainer_village)->first();
 
 
+        $officer_files = DB::table("tbl_files")
+        ->select('filename', 'type', 'size')
+        ->leftJoin('tbl_case', 'tbl_files.case_id', '=', 'tbl_case.id')
+        ->where('case_number', $request->case_id)
+        ->where('file_from', 1)
+        ->get();
+
+        $department_file = DB::table('tbl_files')
+            ->select('filename', 'type', 'size')
+            ->leftJoin('tbl_case', 'tbl_files.case_id', '=', 'tbl_case.id')
+            ->where('case_number', $request->case_id)
+            ->where('file_from', 2)
+            ->get();
+
+
+
+
         return view(
             'pages/viewCase',
             [
@@ -419,9 +446,8 @@ class pageController extends Controller
                 'district' => $district,
                 'commune' => $commune,
                 'village' => $village,
-                'files' => json_decode($case->files_provided),
-                'reference_files' => explode("|", $case->reference_files),
-                'audio_files' => explode(',', $case->voice_recorded)
+                'department_file' => $department_file,
+                'officer_files' => $officer_files,
             ]
         );
     }
@@ -521,23 +547,14 @@ class pageController extends Controller
 
         // Delete the file from the database
         // Fetch the record
-        $record = DB::table('tbl_case')->where('case_number', $case_id)->first();
+        // $record = DB::table('tbl_case')->where('case_number', $case_id)->first();
 
-        if ($record) {
-            // Split the files string into an array
-            $files = explode('|', $record->reference_files);
 
-            // Remove the file from the array
-            $files = array_filter($files, function ($value) use ($file) {
-                return $value != $file;
-            });
 
-            // Join the array back into a string
-            $updatedFiles = implode('|', $files);
 
             // Update the record in the database
-            DB::table('tbl_case')->where('case_number', $case_id)->update(['reference_files' => $updatedFiles]);
-        }
+            DB::table('tbl_files')->select('id')->delete();
+
 
 
         return redirect()->back()->with('success', 'លុបឯកសារបានជោគជ័យ');
@@ -568,13 +585,13 @@ class pageController extends Controller
                     'case_story',
                     'tbl_case.department', // specify the table name
                     'received_date',
-                    'voice_recorded',
+
                     'status',
                     'complainer_address',
-                    'files_provided',
+
                     'case_summary',
                     'solved_summary',
-                    'reference_files',
+
                     'solved_by_user'
                 )
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -599,13 +616,10 @@ class pageController extends Controller
                     'case_story',
                     'tbl_case.department', // specify the table name
                     'received_date',
-                    'voice_recorded',
                     'status',
                     'complainer_address',
-                    'files_provided',
                     'case_summary',
                     'solved_summary',
-                    'reference_files',
                     'solved_by_user'
                 )
                 ->join('tbl_department', 'tbl_case.department', '=', 'tbl_department.id')
@@ -620,6 +634,7 @@ class pageController extends Controller
             'getRecord' => $getRecord,
             'current_date' => $current_date,
             'status' => $status,
+
         ]);
     }
     public function report()
