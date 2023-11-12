@@ -531,25 +531,72 @@ class pageController extends Controller
         $path = "files_complaint/" . $case_id . "/" . $file;
         return Storage::disk('spaces')->download($path);
     }
+
+
+    // public function deleteFile(Request $request, $case_id, $file)
+    // {
+    //     // Convert filename to string
+    //     $file = strval($file);
+    //     $case_id = intval($case_id);
+    //     $subfolder = "files_complaint/" . $case_id;
+    //     $file_path = $subfolder . '/' . $file;
+
+    //     // Find the specific file record from the database
+    //     $fileRecord = DB::table('tbl_files')
+    //         ->where('case_id', $case_id)
+    //         ->where('filename', $file)
+    //         ->first();
+
+    //     if ($fileRecord) {
+    //         // Delete the file from the filesystem
+    //         if (file_exists($file_path)) {
+    //             unlink($file_path);
+    //         }
+    //         // Delete the specific file record from the database
+    //         DB::table('tbl_files')
+    //             ->where('id', $fileRecord->id)
+    //             ->delete();
+
+    //         return redirect()->back()->with('success', 'លុបឯកសារបានជោគជ័យ');
+    //     } else {
+    //         return redirect()->back()->with('error', 'File not found');
+    //     }
+    // }
     public function deleteFile(Request $request, $case_id, $file)
     {
+        // Convert filename to string
+        $file = strval($file);
+
+        // Convert case_id to integer
+        $case_id = intval($case_id);
+
+        // Construct the file path
         $subfolder = "files_complaint/" . $case_id;
-        $file_path = $subfolder . '/' . $file;
-    
-        $fileRecord = DB::table('tbl_files')->first();
-    
-        if ($fileRecord) {
-            // Delete the file record from the database
-            DB::table('tbl_files')
-                ->where('id', $fileRecord->id)
-                ->delete();
-    
-            return redirect()->back()->with('success', 'លុបឯកសារបានជោគជ័យ');
-        } else {
+        $file_path = storage_path($subfolder . '/' . $file);
+        dd($file_path);
+        // Check if the file exists
+        if (!file_exists($file_path)) {
             return redirect()->back()->with('error', 'File not found');
         }
+
+        // Delete the file from the filesystem
+        unlink($file_path);
+
+        // Delete the corresponding file record from the database
+        $fileRecord = DB::table('tbl_files')
+            ->where('id', $request->id)
+            ->where('case_id', '=', $case_id)
+            ->where('filename', '=', $file)
+            ->first();
+
+        if ($fileRecord) {
+            $fileRecord->delete();
+        }
+
+        return redirect()->back()->with('success', 'លុបឯកសារបានជោគជ័យ');
     }
-    
+
+
 
 
 
