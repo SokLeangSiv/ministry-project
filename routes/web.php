@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/downloadPdf',[pageController::class, 'downloadPdf'])->name('pdf');
 
     Route::get('/getfiles/{case_id}/{file}', [pageController::class, 'getFile']);
-    
+
     Route::get('/dashboardCase', [pageController::class, 'dashboardCase'])->name('dashboardCase');
 
     Route::get('/dashboardCase', [pageController::class, 'dashboardCase'])->name('dashboardCase');
@@ -65,10 +65,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/updateCredentials', [pageController::class,'updateCredentials'])->name('updateCredentials');
 
     // delete
-    Route::get('/deleteFile/{case_id}/{file}', [pageController::class, 'deleteFile'])->name('deleteFile');
+    Route::get('/deleteFile/{case_number}/{filename}', [pageController::class, 'deleteFile'])->name('deleteFile');
 });
 
 
 
 
-require __DIR__ . '/auth.php'; 
+require __DIR__ . '/auth.php';
